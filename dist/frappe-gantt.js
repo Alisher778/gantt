@@ -1112,11 +1112,11 @@ class Gantt {
       padding: 18,
       view_mode: 'Day',
       date_format: 'YYYY-MM-DD',
-      popup_trigger: 'click',
+      popup_trigger: 'mouseover',
       custom_popup_html: null,
       language: 'en',
-      draggable: true,
-      hasArrows: true,
+      draggable: false,
+      hasArrows: false,
     };
     this.options = Object.assign({}, default_options, options);
   }

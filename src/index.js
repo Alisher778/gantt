@@ -905,7 +905,7 @@ export default class Gantt {
         this.options.custom_popup_html
       );
     }
-    this.popup.show({ ...options, hello: 1111 });
+    this.popup.show(options);
   }
 
   hide_popup() {
