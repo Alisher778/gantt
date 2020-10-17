@@ -1369,7 +1369,7 @@ class Gantt {
         y: row_y,
         width: row_width,
         height: row_height,
-        class: 'grid-row',
+        class: `grid-row ${task.isChild ? 'child-row' : 'parent-row'}`,
         append_to: rows_layer
       });
 
@@ -1378,7 +1378,7 @@ class Gantt {
         y1: row_y + row_height,
         x2: row_width,
         y2: row_y + row_height,
-        class: 'row-line',
+        class: `row-line ${task.isChild ? 'child-line' : 'parent-line'}`,
         append_to: lines_layer
       });
 
