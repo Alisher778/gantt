@@ -1012,10 +1012,6 @@ class Popup {
       position_meta = options.target_element.getBBox();
     }
 
-    // const gantContainer = 
-    console.log(position_meta);
-    console.log('------', options);
-
     if (options.position === 'left') {
       this.parent.style.left =
         position_meta.x + (position_meta.width + 10) + 'px';
