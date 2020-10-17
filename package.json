@@ -1,7 +1,7 @@
 {
-    "name": "frappe-gantt-alisher",
+    "name": "frappe-gantt-extended",
     "version": "0.5.0",
-    "description": "A simple, modern, interactive gantt library for the web",
+    "description": "Extended version of frappe gantt for my personal project",
     "main": "src/index.js",
     "scripts": {
         "start": "yarn run dev",
@@ -13,7 +13,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/frappe/gantt.git"
+        "url": "https://github.com/Alisher778/frappe-gantt-extended.git"
     },
     "keywords": [
         "gantt",
@@ -26,9 +26,9 @@
     "author": "Faris Ansari",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/frappe/gantt/issues"
+        "url": "https://github.com/Alisher778/frappe-gantt-extended/issues"
     },
-    "homepage": "https://github.com/frappe/gantt",
+    "homepage": "https://github.com/Alisher778/frappe-gantt-extended",
     "devDependencies": {
         "babel-preset-env": "^1.6.1",
         "deepmerge": "^2.0.1",
