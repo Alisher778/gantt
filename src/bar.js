@@ -112,7 +112,7 @@ export default class Bar {
     createSVG('text', {
       x: this.x + this.width / 2,
       y: this.y + this.height / 2,
-      innerHTML: this.task.name,
+      innerHTML: this.task.name + '<tspan class="' + this.task.status + '">' + this.task.status  + '</tspan>',
       class: 'bar-label',
       append_to: this.bar_group
     });
@@ -384,6 +384,8 @@ export default class Bar {
       label.classList.remove('big');
       label.setAttribute('x', bar.getX() + bar.getWidth() / 2);
     }
+
+    console.log(`label: ${label.getBBox().width}`);
   }
 
   update_handle_position() {
