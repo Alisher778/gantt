@@ -109,11 +109,32 @@ export default class Bar {
   }
 
   draw_label() {
-    createSVG('text', {
-      x: this.x + this.width / 2,
-      y: this.y + this.height / 2,
-      innerHTML: this.task.name + '<tspan class="' + this.task.status + '">' + this.task.status  + '</tspan>',
+    const x = this.x + this.width / 2,
+      y = this.y + this.height / 2;
+    
+    this.$statusLabelBar = createSVG('rect', {
+      x: x,
+      y: y,
+      width: 10,
+      height: 10,
+      fill: 'black',
+      class: 'bar-status-label-bar ' + this.task.status.name,
+      append_to: this.bar_group
+    });
+    
+    this.$label = createSVG('text', {
+      x: x,
+      y: y,
+      innerHTML: this.task.name,
       class: 'bar-label',
+      append_to: this.bar_group
+    });
+
+    this.$statusLabel = createSVG('text', {
+      x: x,
+      y: y,
+      innerHTML: this.task.status.label,
+      class: 'bar-status-label',
       append_to: this.bar_group
     });
     // labels get BBox in the next tick
@@ -125,7 +146,7 @@ export default class Bar {
     const bar = this.$bar;
     const handle_width = 8;
 
-    if (this.gantt.options.draggable) {
+    if (this.gantt.options.draggable && this.task.draggable) {
       createSVG('rect', {
         x: bar.getX() + bar.getWidth() - 9,
         y: bar.getY() + 1,
@@ -375,17 +396,34 @@ export default class Bar {
 
   update_label_position() {
     const bar = this.$bar,
-      label = this.group.querySelector('.bar-label');
+      label = this.group.querySelector('.bar-label'),
+      statusLabel = this.group.querySelector('.bar-status-label'),
+      statusLabelBar = this.group.querySelector('.bar-status-label-bar'),
+      space = 10,
+      barPadding = 4;
+    const labelWidth = label.getBBox().width,
+      statusLabelWidth = statusLabel.getBBox().width;
+    const fullLabelWidth = labelWidth + space + barPadding + statusLabelWidth + barPadding;
+    const outsideBar = fullLabelWidth > bar.getWidth();
+    let labelStartX = outsideBar
+      ? bar.getX() + bar.getWidth() + 5
+      : (bar.getX() + bar.getWidth() / 2) - (fullLabelWidth / 2);
 
-    if (label.getBBox().width > bar.getWidth()) {
+    label.setAttribute('x', outsideBar ? labelStartX : labelStartX + labelWidth / 2);
+    statusLabel.setAttribute('x', labelStartX + labelWidth + space + barPadding);
+    statusLabel.setAttribute('y', statusLabel.getBBox().y + 15);
+    statusLabelBar.setAttribute('x', labelStartX + labelWidth + space);
+    statusLabelBar.setAttribute('y', statusLabelBar.getBBox().y - 10);
+    statusLabelBar.setAttribute('width', statusLabelWidth + barPadding + barPadding);
+    statusLabelBar.setAttribute('height', 20);
+
+    if (fullLabelWidth > bar.getWidth()) {
       label.classList.add('big');
-      label.setAttribute('x', bar.getX() + bar.getWidth() + 5);
+      statusLabel.classList.add('big');
     } else {
       label.classList.remove('big');
-      label.setAttribute('x', bar.getX() + bar.getWidth() / 2);
+      statusLabel.classList.remove('big');
     }
-
-    console.log(`label: ${label.getBBox().width}`);
   }
 
   update_handle_position() {
