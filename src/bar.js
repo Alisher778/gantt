@@ -411,9 +411,9 @@ export default class Bar {
 
     label.setAttribute('x', outsideBar ? labelStartX : labelStartX + labelWidth / 2);
     statusLabel.setAttribute('x', labelStartX + labelWidth + space + barPadding);
-    statusLabel.setAttribute('y', statusLabel.getBBox().y + 15);
+    statusLabel.setAttribute('y', label.getBBox().y + 10);
     statusLabelBar.setAttribute('x', labelStartX + labelWidth + space);
-    statusLabelBar.setAttribute('y', statusLabelBar.getBBox().y - 10);
+    statusLabelBar.setAttribute('y', label.getBBox().y - 5);
     statusLabelBar.setAttribute('width', statusLabelWidth + barPadding + barPadding);
     statusLabelBar.setAttribute('height', 20);
 
