@@ -279,7 +279,7 @@ export default class Gantt {
     this.make_arrows();
     this.map_arrows_on_bars();
     this.set_width();
-    this.set_scroll_position();
+    //this.set_scroll_position();
   }
 
   setup_layers() {
