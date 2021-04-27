@@ -88,6 +88,7 @@ export default class Gantt {
       language: 'en',
       draggable: false,
       hasArrows: false,
+      centerCurrentDate: false,
     };
     this.options = Object.assign({}, default_options, options);
   }
@@ -279,7 +280,7 @@ export default class Gantt {
     this.make_arrows();
     this.map_arrows_on_bars();
     this.set_width();
-    //this.set_scroll_position();
+    this.set_scroll_position();
   }
 
   setup_layers() {
@@ -415,7 +416,7 @@ export default class Gantt {
 
   make_grid_highlights() {
     // highlight today's date
-    if (this.view_is(VIEW_MODE.DAY)) {
+    if (this.view_is(VIEW_MODE.DAY) || this.options.centerCurrentDate) {
       const x =
         date_utils.diff(date_utils.today(), this.gantt_start, 'hour') /
         this.options.step *
@@ -646,6 +647,16 @@ export default class Gantt {
       this.options.column_width;
 
     parent_element.scrollLeft = scroll_pos;
+
+    if (this.options.centerCurrentDate) {
+      const gridElement = this.$svg.getElementsByClassName('grid');
+      if (gridElement.length) {
+        const todayElement = gridElement[0].getElementsByClassName('today-highlight');
+        if (todayElement.length) {
+          todayElement[0].scrollIntoView({ behavior: 'auto', block: 'start', inline: 'center' });
+        }
+      }
+    }
   }
 
   bind_grid_click() {
