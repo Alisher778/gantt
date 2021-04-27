@@ -23,6 +23,7 @@ export default class Gantt {
     // initialize with default view mode
     this.change_view_mode();
     this.bind_events();
+    this.currentTasks = [];
   }
 
   setup_wrapper(element) {
@@ -648,7 +649,15 @@ export default class Gantt {
 
     parent_element.scrollLeft = scroll_pos;
 
-    if (this.options.centerCurrentDate) {
+    if (this.currentTasks && this.currentTasks.length) {
+      const barElements = this.$svg.getElementsByClassName('bar');
+      if (barElements.length) {
+        const barWrapperElements = barElements[0].querySelectorAll(`[data-id='` + this.currentTasks[this.currentTasks.length - 1].id + `']`);
+        if (barWrapperElements.length) {
+          barWrapperElements[0].scrollIntoView({ behavior: 'auto', block: 'center', inline: 'center' });
+        }
+      }
+    } else if (this.options.centerCurrentDate) {
       const gridElement = this.$svg.getElementsByClassName('grid');
       if (gridElement.length) {
         const todayElement = gridElement[0].getElementsByClassName('today-highlight');
