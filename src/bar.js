@@ -214,8 +214,27 @@ export default class Bar {
         // just finished a move action, wait for a few seconds
         return;
       }
-
       this.gantt.trigger_event('click', [this.task]);
+    });
+
+    $.on(this.group, 'click', e => {
+      if (this.action_completed) {
+        // just finished a move action, wait for a few seconds
+        return;
+      }
+
+      const currentTaskIndex = this.gantt.currentTasks.findIndex(currentTask => currentTask.id === this.task.id);
+      if (currentTaskIndex >= 0) {
+        // Toggle task, set as not current
+        this.gantt.currentTasks.splice(currentTaskIndex, this.gantt.currentTasks.length - currentTaskIndex);
+      } else {
+        const sameParentIndex = this.gantt.currentTasks.findIndex(currentTask => currentTask.parentId === this.task.parentId);
+        if (sameParentIndex >= 0) {
+          // Remove task with same parent
+          this.gantt.currentTasks.splice(sameParentIndex, this.gantt.currentTasks.length - sameParentIndex);
+        }
+        this.gantt.currentTasks.push(this.task);
+      }
     });
   }
 
