@@ -738,6 +738,7 @@ export default class Gantt {
 
         bars.forEach(bar => {
           const $bar = bar.$bar;
+          this.move_popup($bar);
           $bar.finaldx = this.get_snap_position(dx);
 
           if (is_resizing_left) {
@@ -930,6 +931,10 @@ export default class Gantt {
 
   hide_popup() {
     this.popup && this.popup.hide();
+  }
+
+  move_popup(target_element) {
+    this.popup && this.popup.move(target_element);
   }
 
   trigger_event(event, args) {

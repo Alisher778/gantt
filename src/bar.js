@@ -235,6 +235,8 @@ export default class Bar {
         }
         this.gantt.currentTasks.push(this.task);
       }
+
+      this.gantt.trigger_event('click', [this.task]);
     });
   }
 
