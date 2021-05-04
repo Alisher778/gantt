@@ -77,7 +77,7 @@ export default class Bar {
     this.$bar = createSVG('rect', {
       x: this.x,
       y: this.y,
-      width: this.width,
+      width: this.task.id !== '-' ? this.width : 0,
       height: this.height,
       rx: this.corner_radius,
       ry: this.corner_radius,
@@ -111,16 +111,19 @@ export default class Bar {
   draw_label() {
     const x = this.x + this.width / 2,
       y = this.y + this.height / 2;
+
     
-    this.$statusLabelBar = createSVG('rect', {
-      x: x,
-      y: y,
-      width: 10,
-      height: 10,
-      fill: 'black',
-      class: 'bar-status-label-bar ' + this.task.status.name,
-      append_to: this.bar_group
-    });
+    if (this.task.status) {
+      this.$statusLabelBar = createSVG('rect', {
+        x: x,
+        y: y,
+        width: 10,
+        height: 10,
+        fill: 'black',
+        class: 'bar-status-label-bar ' + this.task.status.name,
+        append_to: this.bar_group
+      });
+    }
     
     this.$label = createSVG('text', {
       x: x,
@@ -130,13 +133,16 @@ export default class Bar {
       append_to: this.bar_group
     });
 
-    this.$statusLabel = createSVG('text', {
-      x: x,
-      y: y,
-      innerHTML: this.task.status.label,
-      class: 'bar-status-label',
-      append_to: this.bar_group
-    });
+    if (this.task.status) {
+      this.$statusLabel = createSVG('text', {
+        x: x,
+        y: y,
+        innerHTML: this.task.status.label,
+        class: 'bar-status-label',
+        append_to: this.bar_group
+      });
+    }
+
     // labels get BBox in the next tick
     requestAnimationFrame(() => this.update_label_position());
   }
@@ -423,7 +429,7 @@ export default class Bar {
       space = 10,
       barPadding = 4;
     const labelWidth = label.getBBox().width,
-      statusLabelWidth = statusLabel.getBBox().width;
+      statusLabelWidth = statusLabel ? statusLabel.getBBox().width : 0;
     const fullLabelWidth = labelWidth + space + barPadding + statusLabelWidth + barPadding;
     const outsideBar = fullLabelWidth > bar.getWidth();
     let labelStartX = outsideBar
@@ -431,19 +437,29 @@ export default class Bar {
       : (bar.getX() + bar.getWidth() / 2) - (fullLabelWidth / 2);
 
     label.setAttribute('x', outsideBar ? labelStartX : labelStartX + labelWidth / 2);
-    statusLabel.setAttribute('x', labelStartX + labelWidth + space + barPadding);
-    statusLabel.setAttribute('y', label.getBBox().y + 10);
-    statusLabelBar.setAttribute('x', labelStartX + labelWidth + space);
-    statusLabelBar.setAttribute('y', label.getBBox().y - 4);
-    statusLabelBar.setAttribute('width', statusLabelWidth + barPadding + barPadding);
-    statusLabelBar.setAttribute('height', 20);
+
+    if (statusLabel) {
+      statusLabel.setAttribute('x', labelStartX + labelWidth + space + barPadding);
+      statusLabel.setAttribute('y', label.getBBox().y + 10);
+    }
+
+    if (statusLabelBar) {
+      statusLabelBar.setAttribute('x', labelStartX + labelWidth + space);
+      statusLabelBar.setAttribute('y', label.getBBox().y - 4);
+      statusLabelBar.setAttribute('width', statusLabelWidth + barPadding + barPadding);
+      statusLabelBar.setAttribute('height', 20);
+    }
 
     if (fullLabelWidth > bar.getWidth()) {
       label.classList.add('big');
-      statusLabel.classList.add('big');
+      if (statusLabel) {
+        statusLabel.classList.add('big');
+      }
     } else {
       label.classList.remove('big');
-      statusLabel.classList.remove('big');
+      if (statusLabel) {
+        statusLabel.classList.remove('big');
+      }
     }
   }
 
