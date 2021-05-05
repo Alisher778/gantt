@@ -70,6 +70,11 @@ export default class Gantt {
     this.popup_wrapper = document.createElement('div');
     this.popup_wrapper.classList.add('popup-wrapper');
     this.$container.appendChild(this.popup_wrapper);
+
+    // progress popup wrapper
+    this.progressPopupWrapper = document.createElement('div');
+    this.progressPopupWrapper.classList.add('popup-wrapper');
+    this.$container.appendChild(this.progressPopupWrapper);
   }
 
   setup_options(options) {
@@ -815,6 +820,7 @@ export default class Gantt {
     });
 
     $.on(this.$svg, 'mousemove', e => {
+      this.hideProgressPopup();
       if (!is_resizing) return;
       let dx = e.offsetX - x_on_start;
       let dy = e.offsetY - y_on_start;
@@ -830,9 +836,16 @@ export default class Gantt {
       $.attr($bar_progress, 'width', $bar_progress.owidth + dx);
       $.attr($handle, 'points', bar.get_progress_polygon_points());
       $bar_progress.finaldx = dx;
+      const new_progress = bar.compute_progress();
+      this.showProgressPopup(
+        {
+          target_element: $bar_progress,
+          title: (new_progress < 10 ? '  ' : (new_progress < 100 ? ' ' : '')) + new_progress + ' %',
+        });
     });
 
     $.on(this.$svg, 'mouseup', () => {
+      if (!is_resizing) return;
       is_resizing = false;
       if (!($bar_progress && $bar_progress.finaldx)) return;
       bar.progress_changed();
@@ -931,6 +944,20 @@ export default class Gantt {
 
   hide_popup() {
     this.popup && this.popup.hide();
+  }
+
+  showProgressPopup(options) {
+    if (!this.progressPopup) {
+      this.progressPopup = new Popup(
+        this.progressPopupWrapper,
+        null,
+      );
+    }
+    this.progressPopup.show(options);
+  }
+
+  hideProgressPopup() {
+    this.progressPopup && this.progressPopup.hide();
   }
 
   move_popup(target_element) {
