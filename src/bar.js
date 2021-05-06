@@ -469,12 +469,16 @@ export default class Bar {
 
   update_handle_position() {
     const bar = this.$bar;
-    this.handle_group
-      .querySelector('.handle.left')
-      .setAttribute('x', bar.getX() + 1);
-    this.handle_group
-      .querySelector('.handle.right')
-      .setAttribute('x', bar.getEndX() - 9);
+    let handleLeft = this.handle_group.querySelector('.handle.left');
+    if (handleLeft) {
+      handleLeft.setAttribute('x', bar.getX() + 1);
+    }
+    
+    let handleRight = this.handle_group.querySelector('.handle.right');
+    if (handleRight) {
+      handleRight.setAttribute('x', bar.getEndX() - 9);
+    }
+      
     const handle = this.group.querySelector('.handle.progress');
     handle &&
       handle.setAttribute('points', this.get_progress_polygon_points());
