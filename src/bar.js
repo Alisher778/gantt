@@ -153,27 +153,31 @@ export default class Bar {
     const handle_width = 8;
 
     if (this.gantt.options.draggable && this.task.draggable) {
-      createSVG('rect', {
-        x: bar.getX() + bar.getWidth() - 9,
-        y: bar.getY() + 1,
-        width: handle_width,
-        height: this.height - 2,
-        rx: this.corner_radius,
-        ry: this.corner_radius,
-        class: 'handle right',
-        append_to: this.handle_group
-      });
+      if (!this.task._realEnd) {
+        createSVG('rect', {
+          x: bar.getX() + bar.getWidth() - 9,
+          y: bar.getY() + 1,
+          width: handle_width,
+          height: this.height - 2,
+          rx: this.corner_radius,
+          ry: this.corner_radius,
+          class: 'handle right',
+          append_to: this.handle_group
+        });
+      }
 
-      createSVG('rect', {
-        x: bar.getX() + 1,
-        y: bar.getY() + 1,
-        width: handle_width,
-        height: this.height - 2,
-        rx: this.corner_radius,
-        ry: this.corner_radius,
-        class: 'handle left',
-        append_to: this.handle_group
-      });
+      if (!this.task._realStart) {
+        createSVG('rect', {
+          x: bar.getX() + 1,
+          y: bar.getY() + 1,
+          width: handle_width,
+          height: this.height - 2,
+          rx: this.corner_radius,
+          ry: this.corner_radius,
+          class: 'handle left',
+          append_to: this.handle_group
+        });
+      }
 
       if (!this.task.fixedProgress && this.task.progress && this.task.progress < 100) {
         this.$handle_progress = createSVG('polygon', {
@@ -249,9 +253,9 @@ export default class Bar {
   show_popup() {
     if (this.gantt.bar_being_dragged) return;
 
-    const start_date = date_utils.format(this.task._start, 'MMM D', this.gantt.options.language);
+    const start_date = date_utils.format(!!this.task._realStart ? this.task._realStart : this.task._start, 'MMM D', this.gantt.options.language);
     const end_date = date_utils.format(
-      date_utils.add(this.task._end, -1, 'second'),
+      date_utils.add(!!this.task._realEnd ? this.task._realEnd : this.task._end, -1, 'second'),
       'MMM D',
       this.gantt.options.language
     );

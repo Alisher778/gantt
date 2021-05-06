@@ -73,7 +73,7 @@ export default class Gantt {
 
     // progress popup wrapper
     this.progressPopupWrapper = document.createElement('div');
-    this.progressPopupWrapper.classList.add('popup-wrapper');
+    this.progressPopupWrapper.classList.add('progress-popup-wrapper');
     this.$container.appendChild(this.progressPopupWrapper);
   }
 
@@ -105,6 +105,14 @@ export default class Gantt {
       // convert to Date objects
       task._start = date_utils.parse(task.start);
       task._end = date_utils.parse(task.end);
+
+      if (!!task.realStart) {
+        task._realStart = date_utils.parse(task.realStart);
+      }
+
+      if (!!task.realEnd) {
+        task._realEnd = date_utils.parse(task.realEnd);
+      }
 
       // make task invalid if duration too large
       if (date_utils.diff(task._end, task._start, 'year') > 10) {
@@ -840,7 +848,9 @@ export default class Gantt {
       this.showProgressPopup(
         {
           target_element: $bar_progress,
-          title: (new_progress < 10 ? '  ' : (new_progress < 100 ? ' ' : '')) + new_progress + ' %',
+          data: {
+            progress: new_progress,
+          },
         });
     });
 
@@ -950,7 +960,11 @@ export default class Gantt {
     if (!this.progressPopup) {
       this.progressPopup = new Popup(
         this.progressPopupWrapper,
-        null,
+        function(task, data) {
+          return `
+          <div class="title">${data.progress + '%'}</div>
+          `;
+        },
       );
     }
     this.progressPopup.show(options);

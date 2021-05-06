@@ -29,14 +29,16 @@ export default class Popup {
     const target_element = options.target_element;
 
     if (this.custom_html) {
-      let html = this.custom_html(options.task);
+      let html = this.custom_html(options.task, options.data);
       html += '<div class="pointer"></div>';
       this.parent.innerHTML = html;
       this.pointer = this.parent.querySelector('.pointer');
     } else {
       // set data
       this.title.innerHTML = options.title;
-      this.subtitle.innerHTML = options.subtitle;
+      if (options.subtitle) {
+        this.subtitle.innerHTML = options.subtitle;
+      }
       this.parent.style.width = this.parent.clientWidth + 'px';
     }
 
