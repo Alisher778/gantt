@@ -133,6 +133,14 @@ export default class Bar {
       append_to: this.bar_group
     });
 
+    this.$statusLabel = createSVG('text', {
+      x: x,
+      y: y,
+      innerHTML: (this.task.progress === 0.01 ? 0 : this.task.progress) + '%',
+      class: 'bar-progress-label',
+      append_to: this.bar_group
+    });
+
     if (this.task.status) {
       this.$statusLabel = createSVG('text', {
         x: x,
@@ -428,13 +436,15 @@ export default class Bar {
   update_label_position() {
     const bar = this.$bar,
       label = this.group.querySelector('.bar-label'),
+      progressLabel = this.group.querySelector('.bar-progress-label'),
       statusLabel = this.group.querySelector('.bar-status-label'),
       statusLabelBar = this.group.querySelector('.bar-status-label-bar'),
       space = 10,
       barPadding = 4;
     const labelWidth = label.getBBox().width,
+      progressLabelWidth = progressLabel.getBBox().width,
       statusLabelWidth = statusLabel ? statusLabel.getBBox().width : 0;
-    const fullLabelWidth = labelWidth + space + barPadding + statusLabelWidth + barPadding;
+    const fullLabelWidth = labelWidth + space + barPadding + statusLabelWidth + barPadding + space + progressLabelWidth;
     const outsideBar = fullLabelWidth > bar.getWidth();
     let labelStartX = outsideBar
       ? bar.getX() + bar.getWidth() + 5
@@ -453,6 +463,11 @@ export default class Bar {
       statusLabelBar.setAttribute('width', statusLabelWidth + barPadding + barPadding);
       statusLabelBar.setAttribute('height', 20);
     }
+    
+    progressLabel.setAttribute('x',
+      !statusLabel 
+        ? labelStartX + labelWidth + space 
+        : labelStartX + labelWidth + space + barPadding + statusLabelWidth + barPadding + space + space);
 
     if (fullLabelWidth > bar.getWidth()) {
       label.classList.add('big');
