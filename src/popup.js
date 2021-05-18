@@ -29,24 +29,21 @@ export default class Popup {
     const target_element = options.target_element;
 
     if (this.custom_html) {
-      let html = this.custom_html(options.task);
+      let html = this.custom_html(options.task, options.data);
       html += '<div class="pointer"></div>';
       this.parent.innerHTML = html;
       this.pointer = this.parent.querySelector('.pointer');
     } else {
       // set data
       this.title.innerHTML = options.title;
-      this.subtitle.innerHTML = options.subtitle;
+      if (options.subtitle) {
+        this.subtitle.innerHTML = options.subtitle;
+      }
       this.parent.style.width = this.parent.clientWidth + 'px';
     }
 
     // set position
-    let position_meta;
-    if (target_element instanceof HTMLElement) {
-      position_meta = target_element.getBoundingClientRect();
-    } else if (target_element instanceof SVGElement) {
-      position_meta = options.target_element.getBBox();
-    }
+    let position_meta = this.getPositionMeta(target_element);
 
     if (options.position === 'left') {
       this.parent.style.left =
@@ -64,5 +61,18 @@ export default class Popup {
 
   hide() {
     this.parent.style.opacity = 0;
+  }
+
+  move(target_element) {
+    let position_meta = this.getPositionMeta(target_element);
+    this.parent.style.top = (position_meta.y + position_meta.height + 5) + 'px';
+  }
+
+  getPositionMeta(target_element) {
+    if (target_element instanceof HTMLElement) {
+      return target_element.getBoundingClientRect();
+    } else if (target_element instanceof SVGElement) {
+      return target_element.getBBox();
+    }
   }
 }

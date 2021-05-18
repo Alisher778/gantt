@@ -23,6 +23,7 @@ export default class Gantt {
     // initialize with default view mode
     this.change_view_mode();
     this.bind_events();
+    this.currentTasks = [];
   }
 
   setup_wrapper(element) {
@@ -69,6 +70,11 @@ export default class Gantt {
     this.popup_wrapper = document.createElement('div');
     this.popup_wrapper.classList.add('popup-wrapper');
     this.$container.appendChild(this.popup_wrapper);
+
+    // progress popup wrapper
+    this.progressPopupWrapper = document.createElement('div');
+    this.progressPopupWrapper.classList.add('progress-popup-wrapper');
+    this.$container.appendChild(this.progressPopupWrapper);
   }
 
   setup_options(options) {
@@ -88,6 +94,7 @@ export default class Gantt {
       language: 'en',
       draggable: false,
       hasArrows: false,
+      centerCurrentDate: false,
     };
     this.options = Object.assign({}, default_options, options);
   }
@@ -98,6 +105,14 @@ export default class Gantt {
       // convert to Date objects
       task._start = date_utils.parse(task.start);
       task._end = date_utils.parse(task.end);
+
+      if (!!task.realStart) {
+        task._realStart = date_utils.parse(task.realStart);
+      }
+
+      if (!!task.realEnd) {
+        task._realEnd = date_utils.parse(task.realEnd);
+      }
 
       // make task invalid if duration too large
       if (date_utils.diff(task._end, task._start, 'year') > 10) {
@@ -415,7 +430,7 @@ export default class Gantt {
 
   make_grid_highlights() {
     // highlight today's date
-    if (this.view_is(VIEW_MODE.DAY)) {
+    if (this.view_is(VIEW_MODE.DAY) || this.options.centerCurrentDate) {
       const x =
         date_utils.diff(date_utils.today(), this.gantt_start, 'hour') /
         this.options.step *
@@ -646,6 +661,24 @@ export default class Gantt {
       this.options.column_width;
 
     parent_element.scrollLeft = scroll_pos;
+
+    if (this.currentTasks && this.currentTasks.length) {
+      const barElements = this.$svg.getElementsByClassName('bar');
+      if (barElements.length) {
+        const barWrapperElements = barElements[0].querySelectorAll(`[data-id='` + this.currentTasks[this.currentTasks.length - 1].id + `']`);
+        if (barWrapperElements.length) {
+          barWrapperElements[0].scrollIntoView({ behavior: 'auto', block: 'center', inline: 'center' });
+        }
+      }
+    } else if (this.options.centerCurrentDate) {
+      const gridElement = this.$svg.getElementsByClassName('grid');
+      if (gridElement.length) {
+        const todayElement = gridElement[0].getElementsByClassName('today-highlight');
+        if (todayElement.length) {
+          todayElement[0].scrollIntoView({ behavior: 'auto', block: 'start', inline: 'center' });
+        }
+      }
+    }
   }
 
   bind_grid_click() {
@@ -718,6 +751,7 @@ export default class Gantt {
 
         bars.forEach(bar => {
           const $bar = bar.$bar;
+          this.move_popup($bar);
           $bar.finaldx = this.get_snap_position(dx);
 
           if (is_resizing_left) {
@@ -794,6 +828,7 @@ export default class Gantt {
     });
 
     $.on(this.$svg, 'mousemove', e => {
+      this.hideProgressPopup();
       if (!is_resizing) return;
       let dx = e.offsetX - x_on_start;
       let dy = e.offsetY - y_on_start;
@@ -809,9 +844,18 @@ export default class Gantt {
       $.attr($bar_progress, 'width', $bar_progress.owidth + dx);
       $.attr($handle, 'points', bar.get_progress_polygon_points());
       $bar_progress.finaldx = dx;
+      const new_progress = bar.compute_progress();
+      this.showProgressPopup(
+        {
+          target_element: $bar_progress,
+          data: {
+            progress: new_progress,
+          },
+        });
     });
 
     $.on(this.$svg, 'mouseup', () => {
+      if (!is_resizing) return;
       is_resizing = false;
       if (!($bar_progress && $bar_progress.finaldx)) return;
       bar.progress_changed();
@@ -910,6 +954,28 @@ export default class Gantt {
 
   hide_popup() {
     this.popup && this.popup.hide();
+  }
+
+  showProgressPopup(options) {
+    if (!this.progressPopup) {
+      this.progressPopup = new Popup(
+        this.progressPopupWrapper,
+        function(task, data) {
+          return `
+          <div class="title">${data.progress + '%'}</div>
+          `;
+        },
+      );
+    }
+    this.progressPopup.show(options);
+  }
+
+  hideProgressPopup() {
+    this.progressPopup && this.progressPopup.hide();
+  }
+
+  move_popup(target_element) {
+    this.popup && this.popup.move(target_element);
   }
 
   trigger_event(event, args) {
